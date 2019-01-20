@@ -85,6 +85,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <string.h>
 #include <ctype.h>
 #include <assert.h>
+#include <sys/wait.h>
 
 #include "globals.h"
 #include "robodoc.h"
@@ -2045,7 +2046,12 @@ static void Generate_Item(
             RB_Change_To_Docdir( docname );
 
             /* Execute line */
-            system( line );
+            int ret = 0;
+            ret = WEXITSTATUS(system( line ));
+            if (ret != 0) {
+                fprintf(stderr, "ERROR EXEC: %s\n", line);
+                exit( ret );
+            };
 
             /* Get back to working dir */
             RB_Change_Back_To_CWD(  );
